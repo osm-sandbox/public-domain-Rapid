@@ -87,7 +87,11 @@ export class ImagerySystem extends AbstractSystem {
         urlhash.on('hashchange', this._hashchange);
         gfx.scene.on('layerchange', this._imageryChanged);
       })
-      .then(() => assets.loadAssetAsync('imagery'))
+      .then(() => {
+        // Load appropriate imagery based on license
+        const imageryAsset = this.context.isPublicDomain() ? 'pd_imagery' : 'imagery';
+        return assets.loadAssetAsync(imageryAsset);
+      })
       .then(data => this._initImageryIndex(data))
       .then(() => this._initWaybackAsync());
       // .catch(e => {

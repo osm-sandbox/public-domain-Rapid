@@ -105,6 +105,9 @@ export class Context extends EventEmitter {
 
     // true/false whether we are in the intro walkthrough
     this.inIntro = false;
+
+    // License configuration for sandbox support
+    this._license = null;
   }
 
 
@@ -184,6 +187,12 @@ export class Context extends EventEmitter {
       .then(() => Promise.all( allSystems.map(s => s.initAsync()) ))
       .then(() => Promise.all( allServices.map(s => s.initAsync()) ))
       .then(() => {
+        // Initialize license from URL hash parameters
+        const license = this.systems.urlhash?.initialHashParams?.get('license');
+        if (license) {
+          this._license = license;
+        }
+
         // Setup the osm connection if we have preauth credentials to use
         const osm = this.services.osm;
         return (osm && this._preauth) ? osm.switchAsync(this._preauth) : Promise.resolve();
@@ -233,6 +242,12 @@ export class Context extends EventEmitter {
 // and both of _those_ should be made dynamic so locale can switch while Rapid is running
   get locale()     { return this._prelocale; }
   set locale(val)  { this._prelocale = val; }    // remember for init time
+
+  /* License configuration for sandbox support */
+  get license()     { return this._license ?? 'odbl'; }
+  set license(val)  { this._license = val; }
+
+  isPublicDomain()  { return this._license === 'cc0'; }
 
 
   _afterLoad(cid, callback) {

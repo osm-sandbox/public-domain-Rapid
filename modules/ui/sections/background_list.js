@@ -554,7 +554,9 @@ export function uiSectionBackgroundList(context) {
    */
   function onMapDraw() {
     const wayback = imagery.getSourceByID('EsriWayback');
-    wayback.refreshLocalReleaseDatesAsync();
+    if (wayback) {
+      wayback.refreshLocalReleaseDatesAsync();
+    }
 
     window.requestIdleCallback(() => {
       renderIfVisible();

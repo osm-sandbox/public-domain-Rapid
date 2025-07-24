@@ -34,6 +34,7 @@ export class AssetSystem extends AbstractSystem {
       latest: {
         'address_formats':           'data/address_formats.min.json',
         'imagery':                   'data/imagery.min.json',
+        'pd_imagery':                'data/pd_imagery.min.json',
         'intro_graph':               'data/intro_graph.min.json',
         'intro_rapid_graph':         'data/intro_rapid_graph.min.json',
         'languages':                 'data/languages.min.json',
@@ -79,6 +80,7 @@ export class AssetSystem extends AbstractSystem {
       local: {
         'address_formats':           'data/address_formats.min.json',
         'imagery':                   'data/imagery.min.json',
+        'pd_imagery':                'data/pd_imagery.min.json',
         'intro_graph':               'data/intro_graph.min.json',
         'intro_rapid_graph':         'data/intro_rapid_graph.min.json',
         'languages':                 'data/languages.min.json',
