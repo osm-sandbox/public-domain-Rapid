@@ -139,8 +139,8 @@ export class RapidSystem extends AbstractSystem {
           }
         }
 
-        // Set some defaults
-        if (!urlhash.initialHashParams.has('datasets')) {
+        // Set some defaults (but not for CC0/public domain projects)
+        if (!urlhash.initialHashParams.has('datasets') && !context.isPublicDomain()) {
           this._addedDatasetIDs = new Set(['fbRoads', 'msBuildings', 'overture-places', 'omdFootways']);  // on menu
           this._enabledDatasetIDs = new Set(['fbRoads', 'msBuildings']);  // checked
           this._datasetsChanged();
@@ -369,16 +369,18 @@ export class RapidSystem extends AbstractSystem {
       this._hadPoweruser = true;
     }
 
-    // datasets
-    const newDatasets = currParams.get('datasets');
-    const oldDatasets = prevParams.get('datasets');
-    if (newDatasets !== oldDatasets) {
-      this._enabledDatasetIDs.clear();
-      if (typeof newDatasets === 'string') {
-        const toEnable = newDatasets.replace(/;/g, ',').split(',').map(s => s.trim()).filter(Boolean);
-        this.enableDatasets(toEnable);
-      } else {  // all removed
-        this._datasetsChanged();
+    // datasets (disabled for CC0/public domain projects)
+    if (!this.context.isPublicDomain()) {
+      const newDatasets = currParams.get('datasets');
+      const oldDatasets = prevParams.get('datasets');
+      if (newDatasets !== oldDatasets) {
+        this._enabledDatasetIDs.clear();
+        if (typeof newDatasets === 'string') {
+          const toEnable = newDatasets.replace(/;/g, ',').split(',').map(s => s.trim()).filter(Boolean);
+          this.enableDatasets(toEnable);
+        } else {  // all removed
+          this._datasetsChanged();
+        }
       }
     }
   }
