@@ -149,6 +149,8 @@ export class UiRapidTool {
    */
   choose(e, d) {
     if (e)  e.preventDefault();
+    // Don't show datasets modal for CC0/public domain projects
+    if (this.context.isPublicDomain()) return;
     if (d)  d.show();
   }
 

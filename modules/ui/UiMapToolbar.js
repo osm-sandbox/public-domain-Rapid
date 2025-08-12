@@ -69,7 +69,7 @@ export class UiMapToolbar {
     const tools = [
       'spacer',
       this.DrawModes,
-      this.Rapid,
+      ...(context.isPublicDomain() ? [] : [this.Rapid]),
       'spacer',
       this.UndoRedo,
       this.Save,
