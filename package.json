@@ -11,7 +11,7 @@
   ],
   "license": "ISC",
   "type": "module",
-  "main": "dist/rapid.min.js",
+  "main": "dist/rapid.esm.js",
   "files": [
     "dist"
   ],
@@ -28,6 +28,7 @@
     "dist:bundle:legacy:dev": "dotenvx run --quiet -- node config/esbuild.config.legacy-dev.js",
     "dist:bundle:modern:prod": "dotenvx run --quiet -- node config/esbuild.config.modern-prod.js",
     "dist:bundle:legacy:prod": "dotenvx run --quiet -- node config/esbuild.config.legacy-prod.js",
+    "dist:bundle:esm": "node config/esbuild.config.esm.js",
     "dist:svg:community": "svg-sprite --symbol --symbol-dest . --shape-id-generator \"community-%s\" --symbol-sprite dist/img/community-sprite.svg node_modules/osm-community-index/dist/img/*.svg",
     "dist:svg:fa": "svg-sprite --symbol --symbol-dest . --symbol-sprite dist/img/fa-sprite.svg svg/fontawesome/*.svg",
     "dist:svg:maki": "svg-sprite --symbol --symbol-dest . --shape-id-generator \"maki-%s\" --symbol-sprite dist/img/maki-sprite.svg node_modules/@mapbox/maki/icons/*.svg",
