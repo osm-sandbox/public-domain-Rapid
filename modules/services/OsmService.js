@@ -1,5 +1,5 @@
 import { Extent, Tiler, Viewport, geoZoomToScale, vecAdd } from '@rapid-sdk/math';
-import { utilArrayChunk, utilArrayGroupBy, utilArrayUniq, utilObjectOmit, utilQsString, utilStringQs } from '@rapid-sdk/util';
+import { utilArrayChunk, utilArrayGroupBy, utilArrayUniq, utilObjectOmit, utilQsString } from '@rapid-sdk/util';
 import _throttle from 'lodash-es/throttle.js';
 import { osmAuth } from 'osm-auth';
 import RBush from 'rbush';
@@ -1308,107 +1308,8 @@ export class OsmService extends AbstractSystem {
       locale: locale
     });
 
-    // Check if this is a sandbox environment and use sandbox authentication
-    if (this._isSandboxEnvironment()) {
-      this._sandboxAuthenticate(gotResult);
-    } else {
-      this._oauth.authenticate(gotResult);
-      this._oauth.bringPopupWindowToFront();  // no guarantees, but we can try
-    }
-  }
-
-  /**
-   * Check if we're in a sandbox environment based on the API URL
-   */
-  _isSandboxEnvironment() {
-    return /\.boxes\.osmsandbox\.us/.test(this._apiroot);
-  }
-
-  /**
-   * Sandbox authentication flow
-   */
-  _sandboxAuthenticate(callback) {
-    this._preopenPopup((error, popup) => {
-      if (error) {
-        callback(error);
-      } else {
-        // Extract sandbox name from API URL
-        const matches = /https:\/\/api\.(.+)\.boxes\.osmsandbox\.us/gi.exec(this._apiroot);
-        const box = matches && matches.length > 1 && matches[1];
-        
-        const origin = window.location.origin || '';
-        const pathname = window.location.pathname || '';
-        const redirectPath = `${origin}${pathname.endsWith('/') ? pathname : pathname + '/'}`;
-        
-        const queryString = new URLSearchParams({ 
-          box: box, 
-          end_redirect_uri: redirectPath + 'land.html' 
-        }).toString();
-        
-        fetch(`https://dashboard.osmsandbox.us/initialize_session?${queryString}`)
-          .then(response => response.json())
-          .then(data => {
-            const sessionId = data.id;
-            this._authenticateWithSession(sessionId, popup, callback);
-          })
-          .catch(error => {
-            console.error('Error initializing sandbox session:', error);
-            callback(error);
-          });
-      }
-    });
-  }
-
-  /**
-   * Opens an empty popup to be later used for the authentication page
-   */
-  _preopenPopup(callback) {
-    // Create a 550x610 popup window in the center of the screen
-    const w = 550;
-    const h = 610;
-    const settings = [
-      ['width', w],
-      ['height', h],
-      ['left', window.screen.width / 2 - w / 2],
-      ['top', window.screen.height / 2 - h / 2],
-    ]
-    .map(x => x.join('='))
-    .join(',');
-    
-    const popup = window.open('about:blank', 'oauth_window', settings);
-    if (popup) {
-      callback(null, popup);
-    } else {
-      const error = new Error('Popup was blocked');
-      error.status = 'popup-blocked';
-      callback(error);
-    }
-  }
-
-  /**
-   * Authenticate with sandbox session
-   */
-  _authenticateWithSession(sessionId, popup, callback) {
-    const queryString = new URLSearchParams({ session_id: sessionId }).toString();
-    const url = `https://dashboard.osmsandbox.us/osm_authorization?${queryString}`;
-
-    this._oauth.popupWindow = popup;
-    popup.location = url;
-
-    // Called by a function in the redirect URL page, in the popup window.
-    // The window closes itself.
-    window.authComplete = (url) => {
-      delete window.authComplete;
-
-      // Extract user from callback URL and log them into the sandbox
-      const urlParams = utilStringQs(url.substring(url.indexOf('?')));
-      popup.location = this._oauth.options().url + '/login?user=' + urlParams.user;
-
-      // Wait for sandbox login to complete, then proceed with OAuth
-      setTimeout(() => {
-        this._oauth.authenticate(callback);
-      }, 3000); // TODO: Replace timeout with proper completion detection
-    };
+    this._oauth.authenticate(gotResult);
+    this._oauth.bringPopupWindowToFront();  // no guarantees, but we can try
   }
 
 
